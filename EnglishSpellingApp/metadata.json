@@ -1,0 +1,6 @@
+{
+  "name": "Daily Spelling Practice",
+  "description": "An elegant daily English spelling practice application built using React and Tailwind CSS.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
