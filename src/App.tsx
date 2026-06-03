@@ -280,8 +280,8 @@ export default function App() {
   };
 
   return (
-    <div id="spelling-app-root" className="min-h-screen bg-slate-50 w-full flex justify-center items-start px-4 py-8 sm:py-16 select-none font-sans">
-      <div id="spelling-container" className="bg-white p-6 sm:p-10 rounded-3xl max-w-lg w-full shadow-sm border border-slate-200">
+    <div id="spelling-app-root" className="min-h-screen w-full flex justify-center items-start px-4 py-8 sm:py-16 select-none" style={{ fontFamily: "var(--font-nunito)" }}>
+      <div id="spelling-container" className="bg-[#FDFCF8] p-6 sm:p-10 rounded-3xl max-w-lg w-full shadow-[0_4px_20px_-2px_rgba(93,112,82,0.15)] border border-[#DED8CF]/50">
         
         {/* Render Header */}
         <Header sessionDay={sessionDay} stats={stats} />

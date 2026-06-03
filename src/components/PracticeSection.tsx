@@ -45,52 +45,62 @@ export const PracticeSection: React.FC<PracticeSectionProps> = ({
   const progressPercentage = ((currentIndex + 1) / totalWords) * 100;
 
   return (
-    <div id="practice-section" className="space-y-6">
+    <motion.div
+      id="practice-section"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="space-y-6"
+    >
       {/* Progress display */}
       <div className="progress">
-        <div className="flex justify-between items-center mb-2.5 text-xs text-slate-500 font-bold uppercase tracking-wider">
+        <div className="flex justify-between items-center mb-2.5 text-xs text-[#78786C] font-bold uppercase tracking-wider">
           <p id="progress-text">
             Word {currentIndex + 1} of {totalWords}
           </p>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-[#78786C]/60">
             {Math.round(progressPercentage)}% Complete
           </p>
         </div>
-        <div className="progress-bar w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/40">
+        <div className="progress-bar w-full h-2 bg-[#F0EBE5] rounded-full overflow-hidden">
           <motion.div
             id="progress-fill"
             initial={{ width: 0 }}
             animate={{ width: `${progressPercentage}%` }}
-            transition={{ duration: 0.3 }}
-            className="height-100 h-full bg-indigo-600 rounded-full"
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="h-full bg-[#5D7052] rounded-full"
           />
         </div>
       </div>
 
-      {/* Word Study Card */}
-      <div className="word-card text-center py-10 px-6 bg-white border border-slate-200 rounded-2xl relative overflow-hidden shadow-sm">
-        {/* Absolute design indicator stripe */}
-        <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-600"></div>
+      {/* Word Study Card - Hero Element */}
+      <div className="word-card text-center py-10 px-6 bg-[#FDFCF8] rounded-3xl relative overflow-hidden shadow-[0_10px_40px_-10px_rgba(193,140,93,0.2)] border border-[#DED8CF]/40">
+        {/* Organic blob shape behind the word for depth */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 organic-blob bg-[#E6DCCD]/30 blur-3xl pointer-events-none" />
         
-        <p className="label text-[10px] text-slate-450 font-extrabold uppercase tracking-widest leading-none">
+        <p className="label text-[10px] text-[#78786C] font-extrabold uppercase tracking-widest leading-none relative z-10">
           Study this word
         </p>
         
-        <div className="h-24 flex items-center justify-center my-4 overflow-hidden">
-          <span
+        <div className="h-24 flex items-center justify-center my-4 overflow-hidden relative z-10">
+          <motion.span
             id="current-word"
-            className={`text-4xl sm:text-5xl font-black text-slate-900 tracking-tight transition-all duration-300 ${
+            key={word + currentIndex}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className={`text-4xl sm:text-5xl font-['Fraunces'] font-semibold text-[#2C2C24] tracking-tight transition-all duration-500 ease-out ${
               wordVisible ? "blur-0" : "blur-[8px] opacity-25 select-none"
             }`}
           >
             {word}
-          </span>
+          </motion.span>
         </div>
 
         <button
           id="hide-btn"
           onClick={onToggleWordVisibility}
-          className="bg-slate-50 border border-slate-200 text-slate-500 hover:text-indigo-600 font-bold px-4 py-2 rounded-xl text-xs shadow-xs hover:bg-slate-100 transition duration-150 mx-auto flex items-center gap-1.5 cursor-pointer"
+          className="relative z-10 text-[#5D7052] border-2 border-[#5D7052]/30 bg-transparent hover:bg-[#5D7052]/10 font-bold px-4 py-2 rounded-full text-xs shadow-none hover:shadow-[0_4px_20px_-2px_rgba(93,112,82,0.15)] transition-all duration-300 ease-out mx-auto flex items-center gap-1.5 cursor-pointer"
         >
           {wordVisible ? (
             <>
@@ -108,7 +118,7 @@ export const PracticeSection: React.FC<PracticeSectionProps> = ({
 
       {/* Guess Input Form */}
       <div className="space-y-4">
-        <p className="instruction text-slate-500 text-xs font-bold uppercase tracking-wider">
+        <p className="instruction text-[#78786C] text-xs font-bold uppercase tracking-wider">
           Now type it from memory:
         </p>
         <input
@@ -124,16 +134,18 @@ export const PracticeSection: React.FC<PracticeSectionProps> = ({
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
-          className="w-full bg-slate-50 px-6 py-4.5 text-xl sm:text-2xl font-bold border-2 border-slate-200 rounded-xl focus:outline-none focus:border-indigo-600 focus:bg-white text-slate-800 text-center placeholder:text-slate-350 disabled:bg-slate-100 disabled:text-slate-400 tracking-wide transition-all duration-150"
+          className="w-full bg-white/50 px-6 py-4.5 text-xl sm:text-2xl font-bold border-2 border-[#DED8CF] rounded-full focus:outline-none focus:ring-2 focus:ring-[#5D7052]/30 focus:border-[#5D7052]/40 text-[#2C2C24] text-center placeholder:text-[#78786C]/50 disabled:bg-[#F0EBE5]/50 disabled:text-[#78786C]/50 tracking-wide transition-all duration-300 ease-out"
         />
-        <button
+        <motion.button
           id="check-btn"
           onClick={onCheckAnswer}
           disabled={isChecking}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold py-4.5 px-6 rounded-xl shadow-lg shadow-indigo-150 hover:shadow-xl transition-all duration-150 focus:outline-none cursor-pointer text-base uppercase tracking-wider"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="w-full bg-[#5D7052] hover:bg-[#4E6047] disabled:bg-[#5D7052]/50 text-[#F3F4F1] font-bold py-4.5 px-6 rounded-full shadow-[0_4px_20px_-2px_rgba(93,112,82,0.15)] hover:shadow-[0_10px_40px_-10px_rgba(193,140,93,0.2)] transition-all duration-300 ease-out focus:outline-none cursor-pointer text-base uppercase tracking-wider"
         >
           Check Answer
-        </button>
+        </motion.button>
       </div>
 
       {/* Feedback Banner */}
@@ -143,15 +155,18 @@ export const PracticeSection: React.FC<PracticeSectionProps> = ({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
-          className={`result p-4 rounded-xl text-center font-bold shadow-md border ${
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className={`result p-4 rounded-2xl text-center font-bold shadow-[0_4px_20px_-2px_rgba(93,112,82,0.15)] border ${
             feedback.status === "correct"
-              ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-              : "bg-rose-50 text-rose-800 border-rose-200"
+              ? "bg-[#F3F4F1] text-[#5D7052] border-[#5D7052]/30"
+              : feedback.status === "empty"
+              ? "bg-[#F0EBE5] text-[#A85448] border-[#A85448]/30"
+              : "bg-[#F0EBE5] text-[#A85448] border-[#A85448]/30"
           }`}
         >
           {feedback.text}
         </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 };

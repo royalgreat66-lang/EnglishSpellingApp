@@ -1,1 +1,76 @@
 @import "tailwindcss";
+
+/* ─── 1. Design Tokens (CSS Custom Properties) ─── */
+:root {
+  /* Colors */
+  --color-rice-paper: #FDFCF8;
+  --color-deep-loam: #2C2C24;
+  --color-moss-green: #5D7052;
+  --color-pale-mist: #F3F4F1;
+  --color-terracotta: #C18C5D;
+  --color-sand-beige: #E6DCCD;
+  --color-stone: #F0EBE5;
+  --color-dried-grass: #78786C;
+  --color-raw-timber: #DED8CF;
+  --color-burnt-sienna: #A85448;
+
+  /* Fonts */
+  --font-fraunces: "Fraunces", serif;
+  --font-nunito: "Nunito", sans-serif;
+
+  /* Shadows */
+  --shadow-moss: 0 4px 20px -2px rgba(93, 112, 82, 0.15);
+  --shadow-float: 0 10px 40px -10px rgba(193, 140, 93, 0.2);
+}
+
+/* ─── 2. Global Base Styles ─── */
+body {
+  font-family: var(--font-nunito);
+  background-color: var(--color-rice-paper);
+  color: var(--color-deep-loam);
+  /* Noise/grain texture using radial-gradient dots */
+  background-image: radial-gradient(#DED8CF 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ─── 3. Typography ─── */
+h1, h2, h3, h4, h5, h6,
+#app-title,
+#mistakes-header,
+#summary-header {
+  font-family: var(--font-fraunces);
+  font-weight: 700;
+  color: var(--color-deep-loam);
+}
+
+/* ─── 4. Organic Blob Shape ─── */
+.organic-blob {
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+}
+
+/* ─── 5. Soft Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-stone);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-raw-timber);
+  border-radius: 10px;
+  border: 2px solid var(--color-stone);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-dried-grass);
+}
+
+/* ─── 6. Fade-in Animation ─── */
+@keyframes organic-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-organic-in {
+  animation: organic-fade-in 0.6s ease-out;
+}
