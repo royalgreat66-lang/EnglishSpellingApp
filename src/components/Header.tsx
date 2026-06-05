@@ -10,7 +10,7 @@ export const Header: React.FC<HeaderProps> = ({ sessionDay, stats }) => {
   return (
     <div id="app-header" className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8 pb-5 border-b border-[#DED8CF]/50">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-extrabold text-xl shadow-xs">S</div>
+        <img src="/EnglishSpellingApp/256.png" alt="App Logo" className="w-10 h-10" />
       </div>
       <div className="flex flex-row sm:flex-col items-center sm:items-end gap-3 justify-between w-full sm:w-auto">
         <div id="day-badge" className="bg-[#5D7052] text-[#F3F4F1] px-4 py-1.5 rounded-full font-['Fraunces'] font-semibold text-xs uppercase tracking-wider shadow-[0_4px_20px_-2px_rgba(93,112,82,0.15)]">
