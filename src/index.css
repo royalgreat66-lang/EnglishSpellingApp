@@ -26,11 +26,26 @@
 /* ─── 2. Global Base Styles ─── */
 body {
   font-family: var(--font-nunito);
-  background-color: var(--color-rice-paper);
+  background-color: transparent;
   color: var(--color-deep-loam);
-  /* Noise/grain texture using radial-gradient dots */
-  background-image: radial-gradient(#DED8CF 1px, transparent 1px);
-  background-size: 24px 24px;
+}
+
+/* ─── 2b. Full-screen Background Texture Overlay ─── */
+#spelling-app-root {
+  position: relative;
+}
+
+#spelling-app-root::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  background-image: linear-gradient(rgba(253, 252, 248, 0.35), rgba(253, 252, 248, 0.35)), url("/EnglishSpellingApp/background.jpg");
+  background-repeat: repeat, repeat;
+  background-size: auto, auto;
 }
 
 /* ─── 3. Typography ─── */

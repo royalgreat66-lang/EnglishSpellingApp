@@ -280,8 +280,8 @@ export default function App() {
   };
 
   return (
-    <div id="spelling-app-root" className="min-h-screen w-full flex-col sm:flex-row flex sm:justify-center items-stretch sm:items-start sm:px-4 select-none bg-[#FDFCF8]" style={{ minHeight: "100dvh", fontFamily: "var(--font-nunito)", paddingTop: "env(safe-area-inset-top, 0px)", paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
-      <div id="spelling-container" className="flex-1 sm:flex-none p-6 sm:p-10 sm:py-16 sm:rounded-3xl max-w-lg w-full shadow-[0_4px_20px_-2px_rgba(93,112,82,0.15)] sm:border sm:border-[#DED8CF]/50">
+    <div id="spelling-app-root" className="min-h-screen w-full flex-col sm:flex-row flex sm:justify-center items-stretch sm:items-start sm:px-4 select-none" style={{ minHeight: "100dvh", fontFamily: "var(--font-nunito)", paddingTop: "env(safe-area-inset-top, 0px)", paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
+      <div id="spelling-container" className="flex-1 sm:flex-none p-6 sm:p-10 sm:py-16 sm:rounded-3xl max-w-lg w-full shadow-[0_4px_20px_-2px_rgba(93,112,82,0.15)] sm:border sm:border-[#DED8CF]/50" style={{ position: "relative", zIndex: 1 }}>
         
         {/* Render Header */}
         <Header sessionDay={sessionDay} stats={stats} />
