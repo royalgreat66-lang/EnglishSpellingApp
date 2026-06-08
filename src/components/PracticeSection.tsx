@@ -11,6 +11,7 @@ interface PracticeSectionProps {
   feedback: ResultFeedback | null;
   onCheckAnswer: () => void;
   isChecking: boolean;
+  isMistakePractice: boolean;
 }
 
 export const PracticeSection: React.FC<PracticeSectionProps> = ({
@@ -22,6 +23,7 @@ export const PracticeSection: React.FC<PracticeSectionProps> = ({
   feedback,
   onCheckAnswer,
   isChecking,
+  isMistakePractice,
 }) => {
   const wordHidden = inputValue.length > 0;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -71,7 +73,17 @@ export const PracticeSection: React.FC<PracticeSectionProps> = ({
       </div>
 
       {/* Word Study Card - Hero Element */}
-      <div className="word-card text-center py-10 px-6 bg-[#FDFCF8] rounded-3xl relative overflow-hidden shadow-[0_10px_40px_-10px_rgba(193,140,93,0.2)] border border-[#DED8CF]/40">
+      <motion.div
+        className="word-card text-center py-10 px-6 bg-[#FDFCF8] rounded-3xl relative overflow-hidden shadow-[0_10px_40px_-10px_rgba(193,140,93,0.2)] border border-[#DED8CF]/40"
+        animate={{
+          borderWidth: isMistakePractice ? "2px" : "1px",
+          borderStyle: "solid",
+          borderColor: isMistakePractice
+            ? "rgba(193, 140, 93, 0.55)"
+            : "rgba(222, 216, 207, 0.4)",
+        }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
         {/* Organic blob shape behind the word for depth */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 organic-blob bg-[#E6DCCD]/30 blur-3xl pointer-events-none" />
         
@@ -98,7 +110,7 @@ export const PracticeSection: React.FC<PracticeSectionProps> = ({
           </motion.span>
         </div>
 
-      </div>
+      </motion.div>
 
       {/* Guess Input Form */}
       <div className="space-y-4">

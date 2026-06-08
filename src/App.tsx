@@ -36,6 +36,9 @@ export default function App() {
   const [retryMode, setRetryMode] = useState<boolean>(false);
   const [isMistakePractice, setIsMistakePractice] = useState<boolean>(false);
 
+  // Slide direction for mode-switch animation: 1 = right→left, -1 = left→right
+  const [slideDirection, setSlideDirection] = useState<number>(1);
+
   // Initialize and synchronise state on app start
   useEffect(() => {
     // Check & populate default localStorage key-values
@@ -155,12 +158,12 @@ export default function App() {
   // Mode-switch handler: abandon current session and switch to the other mode
   const handleSwitchMode = () => {
     if (isMistakePractice) {
-      // Abandoning mistake practice: mistakeWords stay untouched
-      // Switch to daily practice
+      // mistakes → daily: exit right, enter from left (slide left to right)
+      setSlideDirection(-1);
       setupTodayPractice(usedWords);
     } else {
-      // Abandoning daily practice: words reset (they are randomized anyway)
-      // Switch to mistake practice
+      // daily → mistakes: exit left, enter from right (slide right to left)
+      setSlideDirection(1);
       handleStartMistakePractice();
     }
   };
@@ -371,16 +374,24 @@ export default function App() {
         )}
 
         {phase === "practice" && dailyWords.length > 0 && (
-          <PracticeSection
-            word={dailyWords[currentWordIndex]}
-            currentIndex={currentWordIndex}
-            totalWords={dailyWords.length}
-            inputValue={inputValue}
-            onInputChange={setInputValue}
-            feedback={feedback}
-            onCheckAnswer={handleCheckAnswer}
-            isChecking={isChecking}
-          />
+          <motion.div
+            key={isMistakePractice ? "mistakes" : "daily"}
+            initial={{ opacity: 0, x: slideDirection * 60 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            <PracticeSection
+              word={dailyWords[currentWordIndex]}
+              currentIndex={currentWordIndex}
+              totalWords={dailyWords.length}
+              inputValue={inputValue}
+              onInputChange={setInputValue}
+              feedback={feedback}
+              onCheckAnswer={handleCheckAnswer}
+              isChecking={isChecking}
+              isMistakePractice={isMistakePractice}
+            />
+          </motion.div>
         )}
 
         {phase === "summary" && (
