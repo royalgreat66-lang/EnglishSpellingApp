@@ -9,6 +9,8 @@ interface SummarySectionProps {
   onPracticeMore: () => void;
   onRetryWrong: () => void;
   onConfirmReset: () => void;
+  isMistakePractice: boolean;
+  onFinish: () => void;
 }
 
 export const SummarySection: React.FC<SummarySectionProps> = ({
@@ -19,6 +21,8 @@ export const SummarySection: React.FC<SummarySectionProps> = ({
   onPracticeMore,
   onRetryWrong,
   onConfirmReset,
+  isMistakePractice,
+  onFinish,
 }) => {
   const scorePercent = Math.round((correctCount / totalWords) * 100);
 
@@ -73,7 +77,7 @@ export const SummarySection: React.FC<SummarySectionProps> = ({
         >
           <div className="absolute top-0 left-0 bottom-0 w-1 bg-[#A85448]" />
           <h3 className="text-xs font-bold text-[#2C2C24] uppercase tracking-wider pl-1">
-            Words to review tomorrow:
+            {isMistakePractice ? "Still needs practice:" : "Words to review tomorrow:"}
           </h3>
           <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
             {wrongWords.map((word, index) => (
@@ -92,37 +96,53 @@ export const SummarySection: React.FC<SummarySectionProps> = ({
 
       {/* Control buttons */}
       <div className="space-y-3 pt-2">
-        <motion.button
-          id="practice-more-btn"
-          onClick={onPracticeMore}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="w-full bg-[#5D7052] hover:bg-[#4E6047] text-[#F3F4F1] font-extrabold py-4 px-4 rounded-full shadow-[0_4px_20px_-2px_rgba(93,112,82,0.15)] hover:shadow-[0_10px_40px_-10px_rgba(193,140,93,0.2)] transition-all duration-300 ease-out focus:outline-none cursor-pointer text-sm uppercase tracking-wider"
-        >
-          Practice 10 More Words
-        </motion.button>
-
-        {wrongWords.length > 0 && (
+        {isMistakePractice ? (
           <motion.button
-            id="retry-btn"
-            onClick={onRetryWrong}
+            id="mistake-finish-btn"
+            onClick={onFinish}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="w-full bg-transparent hover:bg-[#C18C5D]/10 text-[#C18C5D] border-2 border-[#C18C5D] font-extrabold py-4 px-4 rounded-full transition-all duration-300 ease-out focus:outline-none cursor-pointer text-sm uppercase tracking-wider"
+            className="w-full bg-[#5D7052] hover:bg-[#4E6047] text-[#F3F4F1] font-extrabold py-4 px-4 rounded-full shadow-[0_4px_20px_-2px_rgba(93,112,82,0.15)] hover:shadow-[0_10px_40px_-10px_rgba(193,140,93,0.2)] transition-all duration-300 ease-out focus:outline-none cursor-pointer text-sm uppercase tracking-wider"
           >
-            Retry Missed Words
+            Finish
           </motion.button>
+        ) : (
+          <>
+            <motion.button
+              id="practice-more-btn"
+              onClick={onPracticeMore}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-full bg-[#5D7052] hover:bg-[#4E6047] text-[#F3F4F1] font-extrabold py-4 px-4 rounded-full shadow-[0_4px_20px_-2px_rgba(93,112,82,0.15)] hover:shadow-[0_10px_40px_-10px_rgba(193,140,93,0.2)] transition-all duration-300 ease-out focus:outline-none cursor-pointer text-sm uppercase tracking-wider"
+            >
+              Practice 10 More Words
+            </motion.button>
+
+            {wrongWords.length > 0 && (
+              <motion.button
+                id="retry-btn"
+                onClick={onRetryWrong}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full bg-transparent hover:bg-[#C18C5D]/10 text-[#C18C5D] border-2 border-[#C18C5D] font-extrabold py-4 px-4 rounded-full transition-all duration-300 ease-out focus:outline-none cursor-pointer text-sm uppercase tracking-wider"
+              >
+                Retry Missed Words
+              </motion.button>
+            )}
+          </>
         )}
 
-        <motion.button
-          id="reset-trigger-btn"
-          onClick={onConfirmReset}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="w-full bg-transparent hover:bg-[#F0EBE5] text-[#78786C] font-bold py-3 px-4 rounded-full transition-all duration-300 ease-out focus:outline-none mt-2 text-xs uppercase tracking-wider cursor-pointer border border-[#DED8CF]"
-        >
-          Start Over
-        </motion.button>
+        {!isMistakePractice && (
+          <motion.button
+            id="reset-trigger-btn"
+            onClick={onConfirmReset}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full bg-transparent hover:bg-[#F0EBE5] text-[#78786C] font-bold py-3 px-4 rounded-full transition-all duration-300 ease-out focus:outline-none mt-2 text-xs uppercase tracking-wider cursor-pointer border border-[#DED8CF]"
+          >
+            Start Over
+          </motion.button>
+        )}
       </div>
     </motion.div>
   );

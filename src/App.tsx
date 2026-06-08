@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion } from "motion/react";
 import { allWords } from "./words";
 import { Stats, AppPhase, ResultFeedback } from "./types";
 import { Header } from "./components/Header";
@@ -14,9 +15,10 @@ export default function App() {
     totalIncorrect: 0,
   });
   const [usedWords, setUsedWords] = useState<string[]>([]);
+  const [mistakeWords, setMistakeWords] = useState<string[]>([]);
 
   // Navigation phase and reset overlays
-  const [phase, setPhase] = useState<AppPhase>("practice");
+  const [phase, setPhase] = useState<AppPhase>("idle");
   const [showResetConfirm, setShowResetConfirm] = useState<boolean>(false);
 
   // Active training sets session state
@@ -30,8 +32,9 @@ export default function App() {
   const [isChecking, setIsChecking] = useState<boolean>(false);
   const [feedback, setFeedback] = useState<ResultFeedback | null>(null);
   
-  // Retry and tracking flow settings
+  // Retry, tracking flow, and mistake practice flags
   const [retryMode, setRetryMode] = useState<boolean>(false);
+  const [isMistakePractice, setIsMistakePractice] = useState<boolean>(false);
 
   // Initialize and synchronise state on app start
   useEffect(() => {
@@ -48,6 +51,10 @@ export default function App() {
     if (!localStorage.getItem("totalIncorrect")) {
       localStorage.setItem("totalIncorrect", "0");
     }
+    if (!localStorage.getItem("mistakeWords")) {
+      localStorage.setItem("mistakeWords", "[]");
+    }
+
     // Retrieve initial values
     const day = parseInt(localStorage.getItem("sessionDay") || "1", 10);
     const correct = parseInt(localStorage.getItem("totalCorrect") || "0", 10);
@@ -60,17 +67,36 @@ export default function App() {
       parsedUsed = [];
     }
 
+    let parsedMistakes: string[] = [];
+    try {
+      parsedMistakes = JSON.parse(localStorage.getItem("mistakeWords") || "[]");
+    } catch {
+      parsedMistakes = [];
+    }
+
     setSessionDay(day);
     setStats({
       totalCorrect: correct,
       totalIncorrect: incorrect,
     });
     setUsedWords(parsedUsed);
-    // Start practice immediately
-    setupTodayPractice(parsedUsed);
+    setMistakeWords(parsedMistakes);
+    // If there are accumulated mistake words, show idle screen with choice.
+    // Otherwise skip straight to daily practice.
+    if (parsedMistakes.length > 0) {
+      setPhase("idle");
+    } else {
+      setupTodayPractice(parsedUsed);
+    }
   }, []);
 
-  // Word selection generator helper
+  // Helper to sync mistakeWords to localStorage
+  const syncMistakeWords = (updated: string[]) => {
+    localStorage.setItem("mistakeWords", JSON.stringify(updated));
+    setMistakeWords(updated);
+  };
+
+  // Word selection generator helper for daily practice
   const setupTodayPractice = (activeUsedWords: string[]) => {
     // Filter remaining words that haven't been practiced yet
     let remaining = allWords.filter((w) => !activeUsedWords.includes(w));
@@ -100,6 +126,28 @@ export default function App() {
     setInputValue("");
     setFeedback(null);
     setRetryMode(false);
+    setIsMistakePractice(false);
+    setPhase("practice");
+  };
+
+  // Handler for starting a daily practice session from idle
+  const handleStartDailyPractice = () => {
+    setupTodayPractice(usedWords);
+  };
+
+  // Handler for starting a mistake practice session
+  const handleStartMistakePractice = () => {
+    // Take up to 10 oldest words (FIFO) from mistakeWords
+    const sessionWords = mistakeWords.slice(0, 10);
+
+    setDailyWords(sessionWords);
+    setCurrentWordIndex(0);
+    setCorrectCount(0);
+    setWrongWords([]);
+    setInputValue("");
+    setFeedback(null);
+    setRetryMode(false);
+    setIsMistakePractice(true);
     setPhase("practice");
   };
 
@@ -176,11 +224,39 @@ export default function App() {
           updatedStats.totalIncorrect += currentWrongWords.length;
         }
 
+        // --- mistakeWords management ---
+        let updatedMistakeWords = [...mistakeWords];
+
+        if (isMistakePractice) {
+          // Mistake practice: correct words get removed from mistakeWords permanently
+          // Words that were answered correctly during this session
+          if (isAnswerCorrect) {
+            // currentWord was correct - remove it from mistakeWords
+            updatedMistakeWords = updatedMistakeWords.filter(w => w !== currentWord);
+          }
+          // Wrong words stay in mistakeWords (they're already there)
+        } else if (!retryMode) {
+          // Regular (non-retry) session: add wrong words to mistakeWords if not already present
+          currentWrongWords.forEach((w) => {
+            if (!updatedMistakeWords.includes(w)) {
+              updatedMistakeWords.push(w);
+            }
+          });
+        }
+        // retryMode sessions do NOT touch mistakeWords
+
+        syncMistakeWords(updatedMistakeWords);
         setStats(updatedStats);
         setPhase("summary");
         setIsChecking(false);
       }
     }, 1500);
+  };
+
+  // Return to idle after mistake practice summary
+  const handleReturnToIdle = () => {
+    setIsMistakePractice(false);
+    setPhase("idle");
   };
 
   // Increment Day, load another 10 words
@@ -220,14 +296,19 @@ export default function App() {
     localStorage.setItem("usedWords", "[]");
     localStorage.setItem("totalCorrect", "0");
     localStorage.setItem("totalIncorrect", "0");
+    localStorage.setItem("mistakeWords", "[]");
+
     setSessionDay(1);
     setStats({
       totalCorrect: 0,
       totalIncorrect: 0,
     });
     setUsedWords([]);
+    setMistakeWords([]);
+    
     setShowResetConfirm(false);
-    setupTodayPractice([]);
+    setIsMistakePractice(false);
+    setPhase("idle");
   };
 
   return (
@@ -235,9 +316,46 @@ export default function App() {
       <div id="spelling-container" className="flex-1 sm:flex-none p-6 sm:p-10 sm:py-16 sm:rounded-3xl max-w-lg w-full shadow-[0_4px_20px_-2px_rgba(93,112,82,0.15)] sm:border sm:border-[#DED8CF]/50" style={{ position: "relative", zIndex: 1 }}>
         
         {/* Render Header */}
-        <Header sessionDay={sessionDay} stats={stats} />
+        <Header
+          sessionDay={sessionDay}
+          stats={stats}
+          mistakeCount={mistakeWords.length}
+          onPracticeMistakes={handleStartMistakePractice}
+        />
 
         {/* Render Active Stage Screen Phase */}
+        {phase === "idle" && (
+          <motion.div
+            id="idle-section"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="space-y-4 pt-4"
+          >
+            <motion.button
+              id="start-daily-practice-btn"
+              onClick={handleStartDailyPractice}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-full bg-[#5D7052] hover:bg-[#4E6047] text-[#F3F4F1] font-extrabold py-5 px-4 rounded-full shadow-[0_4px_20px_-2px_rgba(93,112,82,0.15)] hover:shadow-[0_10px_40px_-10px_rgba(193,140,93,0.2)] transition-all duration-300 ease-out focus:outline-none cursor-pointer text-base uppercase tracking-wider"
+            >
+              Start Daily Practice
+            </motion.button>
+
+            {mistakeWords.length > 0 && (
+              <motion.button
+                id="practice-mistakes-btn-idle"
+                onClick={handleStartMistakePractice}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full bg-[#C18C5D] hover:bg-[#B07A4E] text-[#F3F4F1] font-extrabold py-5 px-4 rounded-full shadow-[0_4px_20px_-2px_rgba(93,112,82,0.15)] hover:shadow-[0_10px_40px_-10px_rgba(193,140,93,0.2)] transition-all duration-300 ease-out focus:outline-none cursor-pointer text-base uppercase tracking-wider"
+              >
+                Practice Mistakes ({mistakeWords.length})
+              </motion.button>
+            )}
+          </motion.div>
+        )}
+
         {phase === "practice" && dailyWords.length > 0 && (
           <PracticeSection
             word={dailyWords[currentWordIndex]}
@@ -260,6 +378,8 @@ export default function App() {
             onPracticeMore={handlePracticeMore}
             onRetryWrong={handleRetryWrongWords}
             onConfirmReset={handleConfirmResetClick}
+            isMistakePractice={isMistakePractice}
+            onFinish={handleReturnToIdle}
           />
         )}
 
