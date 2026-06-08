@@ -96,6 +96,17 @@ export default function App() {
     setMistakeWords(updated);
   };
 
+  // Reset practice session state (shared between modes)
+  const resetPracticeState = () => {
+    setCurrentWordIndex(0);
+    setCorrectCount(0);
+    setWrongWords([]);
+    setInputValue("");
+    setFeedback(null);
+    setIsChecking(false);
+    setRetryMode(false);
+  };
+
   // Word selection generator helper for daily practice
   const setupTodayPractice = (activeUsedWords: string[]) => {
     // Filter remaining words that haven't been practiced yet
@@ -119,13 +130,8 @@ export default function App() {
     setUsedWords(updatedUsed);
 
     // Load into state
+    resetPracticeState();
     setDailyWords(next10);
-    setCurrentWordIndex(0);
-    setCorrectCount(0);
-    setWrongWords([]);
-    setInputValue("");
-    setFeedback(null);
-    setRetryMode(false);
     setIsMistakePractice(false);
     setPhase("practice");
   };
@@ -140,15 +146,23 @@ export default function App() {
     // Take up to 10 oldest words (FIFO) from mistakeWords
     const sessionWords = mistakeWords.slice(0, 10);
 
+    resetPracticeState();
     setDailyWords(sessionWords);
-    setCurrentWordIndex(0);
-    setCorrectCount(0);
-    setWrongWords([]);
-    setInputValue("");
-    setFeedback(null);
-    setRetryMode(false);
     setIsMistakePractice(true);
     setPhase("practice");
+  };
+
+  // Mode-switch handler: abandon current session and switch to the other mode
+  const handleSwitchMode = () => {
+    if (isMistakePractice) {
+      // Abandoning mistake practice: mistakeWords stay untouched
+      // Switch to daily practice
+      setupTodayPractice(usedWords);
+    } else {
+      // Abandoning daily practice: words reset (they are randomized anyway)
+      // Switch to mistake practice
+      handleStartMistakePractice();
+    }
   };
 
   // Validate answer checking
@@ -229,9 +243,7 @@ export default function App() {
 
         if (isMistakePractice) {
           // Mistake practice: correct words get removed from mistakeWords permanently
-          // Words that were answered correctly during this session
           if (isAnswerCorrect) {
-            // currentWord was correct - remove it from mistakeWords
             updatedMistakeWords = updatedMistakeWords.filter(w => w !== currentWord);
           }
           // Wrong words stay in mistakeWords (they're already there)
@@ -320,8 +332,9 @@ export default function App() {
           sessionDay={sessionDay}
           stats={stats}
           mistakeCount={mistakeWords.length}
-          onPracticeMistakes={handleStartMistakePractice}
           isActiveSession={phase === "practice"}
+          isMistakePractice={isMistakePractice}
+          onSwitchMode={handleSwitchMode}
         />
 
         {/* Render Active Stage Screen Phase */}

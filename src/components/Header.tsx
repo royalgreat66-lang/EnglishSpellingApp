@@ -6,11 +6,19 @@ interface HeaderProps {
   sessionDay: number;
   stats: Stats;
   mistakeCount: number;
-  onPracticeMistakes: () => void;
   isActiveSession: boolean;
+  isMistakePractice: boolean;
+  onSwitchMode: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ sessionDay, stats, mistakeCount, onPracticeMistakes, isActiveSession }) => {
+export const Header: React.FC<HeaderProps> = ({
+  sessionDay,
+  stats,
+  mistakeCount,
+  isActiveSession,
+  isMistakePractice,
+  onSwitchMode,
+}) => {
   return (
     <div id="app-header" className="mb-3 pb-5 border-b border-[#DED8CF]/50">
       {/* Main header row — never wraps, always left icon + right-stacked badges */}
@@ -37,18 +45,34 @@ export const Header: React.FC<HeaderProps> = ({ sessionDay, stats, mistakeCount,
         </div>
       </div>
 
-      {/* Practice Mistakes button — only shown during an active practice session */}
-      {isActiveSession && mistakeCount > 0 && (
+      {/* Mode-switching button — only shown during an active practice session */}
+      {isActiveSession && (
         <div className="flex justify-center mt-3">
-          <motion.button
-            id="practice-mistakes-btn"
-            onClick={onPracticeMistakes}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-[#C18C5D] hover:bg-[#B07A4E] text-[#F3F4F1] px-3 py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-wider shadow-[0_4px_20px_-2px_rgba(93,112,82,0.15)] transition-all duration-300 ease-out cursor-pointer flex-shrink-0"
-          >
-            Practice Mistakes ({mistakeCount})
-          </motion.button>
+          {isMistakePractice ? (
+            /* In mistakes mode: show green "Daily Practice" button */
+            <motion.button
+              id="switch-to-daily-btn"
+              onClick={onSwitchMode}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-[#5D7052] hover:bg-[#4E6047] text-[#F3F4F1] px-3 py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-wider shadow-[0_4px_20px_-2px_rgba(93,112,82,0.15)] transition-all duration-300 ease-out cursor-pointer flex-shrink-0"
+            >
+              Daily Practice
+            </motion.button>
+          ) : (
+            /* In daily practice mode: show brown "Practice Mistakes (N)" button */
+            mistakeCount > 0 && (
+              <motion.button
+                id="practice-mistakes-btn"
+                onClick={onSwitchMode}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-[#C18C5D] hover:bg-[#B07A4E] text-[#F3F4F1] px-3 py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-wider shadow-[0_4px_20px_-2px_rgba(93,112,82,0.15)] transition-all duration-300 ease-out cursor-pointer flex-shrink-0"
+              >
+                Practice Mistakes ({mistakeCount})
+              </motion.button>
+            )
+          )}
         </div>
       )}
     </div>
