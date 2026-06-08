@@ -321,6 +321,7 @@ export default function App() {
           stats={stats}
           mistakeCount={mistakeWords.length}
           onPracticeMistakes={handleStartMistakePractice}
+          isActiveSession={phase === "practice"}
         />
 
         {/* Render Active Stage Screen Phase */}

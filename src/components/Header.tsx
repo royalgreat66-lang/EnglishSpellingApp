@@ -7,9 +7,10 @@ interface HeaderProps {
   stats: Stats;
   mistakeCount: number;
   onPracticeMistakes: () => void;
+  isActiveSession: boolean;
 }
 
-export const Header: React.FC<HeaderProps> = ({ sessionDay, stats, mistakeCount, onPracticeMistakes }) => {
+export const Header: React.FC<HeaderProps> = ({ sessionDay, stats, mistakeCount, onPracticeMistakes, isActiveSession }) => {
   return (
     <div id="app-header" className="mb-3 pb-5 border-b border-[#DED8CF]/50">
       {/* Main header row — never wraps, always left icon + right-stacked badges */}
@@ -36,9 +37,9 @@ export const Header: React.FC<HeaderProps> = ({ sessionDay, stats, mistakeCount,
         </div>
       </div>
 
-      {/* Practice Mistakes button — separate full-width row below the header */}
-      {mistakeCount > 0 && (
-        <div className="flex justify-end mt-3">
+      {/* Practice Mistakes button — only shown during an active practice session */}
+      {isActiveSession && mistakeCount > 0 && (
+        <div className="flex justify-center mt-3">
           <motion.button
             id="practice-mistakes-btn"
             onClick={onPracticeMistakes}
