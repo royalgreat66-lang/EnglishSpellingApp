@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { allWords } from "./words";
 import { Stats, AppPhase, ResultFeedback } from "./types";
 import { Header } from "./components/Header";
-import { YesterdayMistakes } from "./components/YesterdayMistakes";
 import { PracticeSection } from "./components/PracticeSection";
 import { SummarySection } from "./components/SummarySection";
 import { ConfirmOverlay } from "./components/ConfirmOverlay";
@@ -14,11 +13,10 @@ export default function App() {
     totalCorrect: 0,
     totalIncorrect: 0,
   });
-  const [yesterdayMistakes, setYesterdayMistakes] = useState<string[]>([]);
   const [usedWords, setUsedWords] = useState<string[]>([]);
 
   // Navigation phase and reset overlays
-  const [phase, setPhase] = useState<AppPhase>("review");
+  const [phase, setPhase] = useState<AppPhase>("practice");
   const [showResetConfirm, setShowResetConfirm] = useState<boolean>(false);
 
   // Active training sets session state
@@ -50,10 +48,6 @@ export default function App() {
     if (!localStorage.getItem("totalIncorrect")) {
       localStorage.setItem("totalIncorrect", "0");
     }
-    if (!localStorage.getItem("yesterdayMistakes")) {
-      localStorage.setItem("yesterdayMistakes", "[]");
-    }
-
     // Retrieve initial values
     const day = parseInt(localStorage.getItem("sessionDay") || "1", 10);
     const correct = parseInt(localStorage.getItem("totalCorrect") || "0", 10);
@@ -66,27 +60,14 @@ export default function App() {
       parsedUsed = [];
     }
 
-    let parsedMistakes: string[] = [];
-    try {
-      parsedMistakes = JSON.parse(localStorage.getItem("yesterdayMistakes") || "[]");
-    } catch {
-      parsedMistakes = [];
-    }
-
     setSessionDay(day);
     setStats({
       totalCorrect: correct,
       totalIncorrect: incorrect,
     });
     setUsedWords(parsedUsed);
-    setYesterdayMistakes(parsedMistakes);
-
-    // If yesterday mistakes exist, show the review stage, otherwise start practice immediately
-    if (parsedMistakes.length > 0) {
-      setPhase("review");
-    } else {
-      setupTodayPractice(parsedUsed);
-    }
+    // Start practice immediately
+    setupTodayPractice(parsedUsed);
   }, []);
 
   // Word selection generator helper
@@ -120,11 +101,6 @@ export default function App() {
     setFeedback(null);
     setRetryMode(false);
     setPhase("practice");
-  };
-
-  // Handler for beginning standard practice after review
-  const handleStartPracticeDirect = () => {
-    setupTodayPractice(usedWords);
   };
 
   // Validate answer checking
@@ -200,10 +176,6 @@ export default function App() {
           updatedStats.totalIncorrect += currentWrongWords.length;
         }
 
-        // Save current session failures as tomorrow's review targets
-        localStorage.setItem("yesterdayMistakes", JSON.stringify(currentWrongWords));
-        setYesterdayMistakes(currentWrongWords);
-        
         setStats(updatedStats);
         setPhase("summary");
         setIsChecking(false);
@@ -248,16 +220,12 @@ export default function App() {
     localStorage.setItem("usedWords", "[]");
     localStorage.setItem("totalCorrect", "0");
     localStorage.setItem("totalIncorrect", "0");
-    localStorage.setItem("yesterdayMistakes", "[]");
-
     setSessionDay(1);
     setStats({
       totalCorrect: 0,
       totalIncorrect: 0,
     });
     setUsedWords([]);
-    setYesterdayMistakes([]);
-    
     setShowResetConfirm(false);
     setupTodayPractice([]);
   };
@@ -270,13 +238,6 @@ export default function App() {
         <Header sessionDay={sessionDay} stats={stats} />
 
         {/* Render Active Stage Screen Phase */}
-        {phase === "review" && (
-          <YesterdayMistakes
-            words={yesterdayMistakes}
-            onStartPractice={handleStartPracticeDirect}
-          />
-        )}
-
         {phase === "practice" && dailyWords.length > 0 && (
           <PracticeSection
             word={dailyWords[currentWordIndex]}

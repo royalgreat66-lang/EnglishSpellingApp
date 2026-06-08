@@ -3,7 +3,7 @@ export interface Stats {
   totalIncorrect: number;
 }
 
-export type AppPhase = "review" | "practice" | "summary";
+export type AppPhase = "practice" | "summary";
 
 export interface ResultFeedback {
   status: "correct" | "incorrect" | "empty";
