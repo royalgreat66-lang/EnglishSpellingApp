@@ -1,6 +1,5 @@
 export interface Stats {
   totalCorrect: number;
-  totalCorrected: number;
   totalIncorrect: number;
 }
 

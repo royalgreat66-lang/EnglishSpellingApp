@@ -12,7 +12,6 @@ export default function App() {
   const [sessionDay, setSessionDay] = useState<number>(1);
   const [stats, setStats] = useState<Stats>({
     totalCorrect: 0,
-    totalCorrected: 0,
     totalIncorrect: 0,
   });
   const [yesterdayMistakes, setYesterdayMistakes] = useState<string[]>([]);
@@ -29,7 +28,6 @@ export default function App() {
   const [wrongWords, setWrongWords] = useState<string[]>([]);
   
   // Interactive inputs and visual flags
-  const [wordVisible, setWordVisible] = useState<boolean>(true);
   const [inputValue, setInputValue] = useState<string>("");
   const [isChecking, setIsChecking] = useState<boolean>(false);
   const [feedback, setFeedback] = useState<ResultFeedback | null>(null);
@@ -52,9 +50,6 @@ export default function App() {
     if (!localStorage.getItem("totalIncorrect")) {
       localStorage.setItem("totalIncorrect", "0");
     }
-    if (!localStorage.getItem("totalCorrected")) {
-      localStorage.setItem("totalCorrected", "0");
-    }
     if (!localStorage.getItem("yesterdayMistakes")) {
       localStorage.setItem("yesterdayMistakes", "[]");
     }
@@ -62,7 +57,6 @@ export default function App() {
     // Retrieve initial values
     const day = parseInt(localStorage.getItem("sessionDay") || "1", 10);
     const correct = parseInt(localStorage.getItem("totalCorrect") || "0", 10);
-    const corrected = parseInt(localStorage.getItem("totalCorrected") || "0", 10);
     const incorrect = parseInt(localStorage.getItem("totalIncorrect") || "0", 10);
     
     let parsedUsed: string[] = [];
@@ -82,7 +76,6 @@ export default function App() {
     setSessionDay(day);
     setStats({
       totalCorrect: correct,
-      totalCorrected: corrected,
       totalIncorrect: incorrect,
     });
     setUsedWords(parsedUsed);
@@ -123,7 +116,6 @@ export default function App() {
     setCurrentWordIndex(0);
     setCorrectCount(0);
     setWrongWords([]);
-    setWordVisible(true);
     setInputValue("");
     setFeedback(null);
     setRetryMode(false);
@@ -133,11 +125,6 @@ export default function App() {
   // Handler for beginning standard practice after review
   const handleStartPracticeDirect = () => {
     setupTodayPractice(usedWords);
-  };
-
-  // Toggle spelling study card text hide/show masking helper
-  const handleToggleWordVisibility = () => {
-    setWordVisible((prev) => !prev);
   };
 
   // Validate answer checking
@@ -174,7 +161,6 @@ export default function App() {
       if (currentWordIndex < dailyWords.length - 1) {
         setCurrentWordIndex((prev) => prev + 1);
         setInputValue("");
-        setWordVisible(true);
         setFeedback(null);
         setIsChecking(false);
       } else {
@@ -187,17 +173,17 @@ export default function App() {
         let updatedStats = { ...stats };
 
         if (retryMode) {
-          // Corrections updates
+          // In retry mode, corrected words count as fully correct
           localStorage.setItem(
-            "totalCorrected",
-            (stats.totalCorrected + finalCorrectCount).toString()
+            "totalCorrect",
+            (stats.totalCorrect + finalCorrectCount).toString()
           );
           localStorage.setItem(
             "totalIncorrect",
             Math.max(0, stats.totalIncorrect - finalCorrectCount).toString()
           );
 
-          updatedStats.totalCorrected += finalCorrectCount;
+          updatedStats.totalCorrect += finalCorrectCount;
           updatedStats.totalIncorrect = Math.max(0, stats.totalIncorrect - finalCorrectCount);
         } else {
           // Standard additions
@@ -241,7 +227,6 @@ export default function App() {
     setCurrentWordIndex(0);
     setCorrectCount(0);
     setWrongWords([]);
-    setWordVisible(true);
     setInputValue("");
     setFeedback(null);
     setPhase("practice");
@@ -263,13 +248,11 @@ export default function App() {
     localStorage.setItem("usedWords", "[]");
     localStorage.setItem("totalCorrect", "0");
     localStorage.setItem("totalIncorrect", "0");
-    localStorage.setItem("totalCorrected", "0");
     localStorage.setItem("yesterdayMistakes", "[]");
 
     setSessionDay(1);
     setStats({
       totalCorrect: 0,
-      totalCorrected: 0,
       totalIncorrect: 0,
     });
     setUsedWords([]);
@@ -299,8 +282,6 @@ export default function App() {
             word={dailyWords[currentWordIndex]}
             currentIndex={currentWordIndex}
             totalWords={dailyWords.length}
-            wordVisible={wordVisible}
-            onToggleWordVisibility={handleToggleWordVisibility}
             inputValue={inputValue}
             onInputChange={setInputValue}
             feedback={feedback}

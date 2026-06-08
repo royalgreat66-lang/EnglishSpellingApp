@@ -6,8 +6,6 @@ interface PracticeSectionProps {
   word: string;
   currentIndex: number;
   totalWords: number;
-  wordVisible: boolean;
-  onToggleWordVisibility: () => void;
   inputValue: string;
   onInputChange: (val: string) => void;
   feedback: ResultFeedback | null;
@@ -19,14 +17,13 @@ export const PracticeSection: React.FC<PracticeSectionProps> = ({
   word,
   currentIndex,
   totalWords,
-  wordVisible,
-  onToggleWordVisibility,
   inputValue,
   onInputChange,
   feedback,
   onCheckAnswer,
   isChecking,
 }) => {
+  const wordHidden = inputValue.length > 0;
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Autofocus the text input whenever the word index changes
@@ -87,33 +84,20 @@ export const PracticeSection: React.FC<PracticeSectionProps> = ({
             id="current-word"
             key={word + currentIndex}
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className={`text-4xl sm:text-5xl font-['Fraunces'] font-semibold text-[#2C2C24] tracking-tight transition-all duration-500 ease-out ${
-              wordVisible ? "blur-0" : "blur-[8px] opacity-25 select-none"
+            animate={{
+              opacity: wordHidden ? 0.25 : 1,
+              y: 0,
+              filter: wordHidden ? "blur(8px)" : "blur(0px)",
+            }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className={`text-4xl sm:text-5xl font-['Fraunces'] font-semibold text-[#2C2C24] tracking-tight select-none ${
+              wordHidden ? "pointer-events-none" : ""
             }`}
           >
             {word}
           </motion.span>
         </div>
 
-        <button
-          id="hide-btn"
-          onClick={onToggleWordVisibility}
-          className="relative z-10 text-[#5D7052] border-2 border-[#5D7052]/30 bg-transparent hover:bg-[#5D7052]/10 font-bold px-4 py-2 rounded-full text-xs shadow-none hover:shadow-[0_4px_20px_-2px_rgba(93,112,82,0.15)] transition-all duration-300 ease-out mx-auto flex items-center gap-1.5 cursor-pointer"
-        >
-          {wordVisible ? (
-            <>
-              <span>👁</span>
-              <span>Hide Word</span>
-            </>
-          ) : (
-            <>
-              <span>🙈</span>
-              <span>Show Word</span>
-            </>
-          )}
-        </button>
       </div>
 
       {/* Guess Input Form */}

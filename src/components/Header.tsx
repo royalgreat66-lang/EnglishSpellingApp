@@ -21,10 +21,6 @@ export const Header: React.FC<HeaderProps> = ({ sessionDay, stats }) => {
             ✓ <span id="total-correct">{stats.totalCorrect}</span>
           </span>
           <span className="text-[#DED8CF] mx-2">|</span>
-          <span id="stat-corrected-wrapper" className="text-amber-500">
-            ↺ <span id="total-corrected">{stats.totalCorrected}</span>
-          </span>
-          <span className="text-[#DED8CF] mx-2">|</span>
           <span id="stat-incorrect-wrapper" className="text-rose-600">
             ✗ <span id="total-incorrect">{stats.totalIncorrect}</span>
           </span>
